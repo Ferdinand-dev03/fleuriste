@@ -1,24 +1,68 @@
-import logo from './logo.svg';
-import './App.css';
+import NavBar from './component/navBar';
+import About from './pages/About';
+import Contact from './pages/contact';
+import Acceuil from './pages/Home';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+
+} from 'react-router-dom'
+import ThemeProvider from './utils/context/Context';
+import GlobalStyle from './style/globalStyle';
+import Footer from './component/Footer';
+import Paniers from './pages/Panier';
+import { useState } from 'react';
+import { plantList } from './data/plantList';
+import PanierContainer from './component/panier/PanierContainer';
 
 function App() {
+
+  const [active, setActive] = useState(null)
+  const [ajout, setAjout] = useState([]);
+  const [souhait, setSouhait] = useState([]);
+  const handleAdd = (add)=> {
+    setAjout(ajout => [...ajout, add])
+    setActive(true)
+  }
+  const handleDelet = (id)=> {
+    setAjout(item => item.filter(items => items.id !== id) )
+    setActive(false)
+  }
+  const handleDeletSouh = (id)=> {
+    setSouhait(item => item.filter(items => items.id !== id) )
+    setActive(false)
+  }
+  const handleSouhait = (items, id)=> {
+    setSouhait(item => [...item, items ])
+    setActive()
+  }
+
+  console.log(active)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <ThemeProvider>
+        <GlobalStyle/>
+        <NavBar ajout={ajout} />
+        <Routes>
+          <Route path='/Paniers/:id' element={<PanierContainer 
+              ajout={ajout} 
+              onAdd={handleAdd}   
+              onDelet={handleDelet} 
+              souhait={souhait}
+              Active={active}
+              onDeleSouh={handleDeletSouh}
+
+          />} />
+          <Route path='/' element={<Acceuil onAdd = {handleAdd} Active={active} onSouhait={handleSouhait} />}/>
+          <Route path='/Apropos' element={<About/>}/>
+          <Route path='/contact' element={<Contact/>}/>
+
+        </Routes>
+        <Footer/>
+      </ThemeProvider>
+    </Router>
   );
 }
 
